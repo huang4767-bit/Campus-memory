@@ -46,7 +46,8 @@ request.interceptors.response.use(
             refresh: refreshToken,
           });
 
-          const { access } = res.data.data;
+          // SimpleJWT 直接返回 {access: "..."} / SimpleJWT returns {access: "..."} directly
+          const { access } = res.data;
           localStorage.setItem('access_token', access);
           originalRequest.headers.Authorization = `Bearer ${access}`;
 

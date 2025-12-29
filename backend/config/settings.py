@@ -96,7 +96,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME", "campus_memory"),
         "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "Rxgt123456789"),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
     }
@@ -172,3 +172,6 @@ SIMPLE_JWT = {
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True  # 开发环境允许所有，生产环境需要配置具体域名
+
+# Custom User Model / 自定义用户模型
+AUTH_USER_MODEL = 'users.User'

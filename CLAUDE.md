@@ -18,6 +18,15 @@ Campus Memory（校园记忆）是一个面向初高中毕业生的校友社交�
 - 实时通信：短轮询（前端每 5 秒轮询）
 - 文件存储：本地存储
 
+## 开发服务器
+- 后端开发端口：8001（Swagger 文档：`/swagger/`，管理后台：`/admin/`）
+- 前端开发端口：3000
+- 启动脚本：
+  - `start_dev_environment.ps1`：一键启动前后端开发环境
+  - `start_backend_dev.ps1`：仅启动后端
+  - `start_frontend_dev.ps1`：仅启动前端
+  - `stop_dev_environment.ps1`：停止所有开发服务
+
 ## 目录结构
 - frontend/src/components/：通用组件（Layout、PostCard、UserAvatar 等）
 - frontend/src/pages/：页面组件（Home、Login、Register、Circle、Post、Profile、Album、Message、Admin）
@@ -40,6 +49,7 @@ Campus Memory（校园记忆）是一个面向初高中毕业生的校友社交�
 - 文件组织：前端一个组件一个文件夹，后端按 Django app 标准结构
 - 注释要求：复杂业务逻辑必须写注释，简单代码不用
 - 注释语言：所有代码注释必须使用中英双语，格式为「中文 / English」
+- **公共模块复用**：开发前必须检查 `backend/common/` 和 `frontend/src/utils/` 目录，优先复用现有模块（如分页、异常处理、响应格式等），避免重复造轮子，便于后期运维
 
 ## 前端样式规范
 - **统一使用 Ant Design 的 `useToken` 获取主题变量，禁止使用独立的 CSS 变量文件**
@@ -72,10 +82,32 @@ const MyComponent = () => {
 - 排序参数：`ordering`（前缀 `-` 表示降序）
 - 幂等设计：点赞/收藏重复请求返回当前状态；入圈/好友申请重复返回 409
 
+## 开发命令
+- 命令必须兼容 Windows/PowerShell（不使用 `&&` 连接命令）
+- 后端启动：
+  ```powershell
+  cd backend
+  python manage.py makemigrations   # 仅当模型变更时 / only when schema changes
+  python manage.py migrate
+  python manage.py runserver 0.0.0.0:8001
+  ```
+- 前端启动：
+  ```powershell
+  cd frontend
+  npm install        # 首次运行 / first time only
+  npm run dev        # Vite 开发服务器 / Vite dev server
+  npm run build      # 打包前端 / Vite build
+  ```
+- 测试命令：
+  - 后端：`cd backend` 然后 `pytest`
+  - 前端：`cd frontend` 然后 `npm test`
+
 ## 工作流程
-1. 修改代码前，先阅读相关文件，理解上下文
-2. 涉及接口变更时，同步更新 docs/api.md
-3. 新增功能参考 PRD.md 中的功能定义和数据库设计
+1. **执行任务前，先阅读 `.memories/modules/` 目录**（从 `project-overview` 开始），了解项目背景和历史决策
+2. 修改代码前，先阅读相关文件，理解上下文
+3. 涉及接口变更时，同步更新 docs/api.md
+4. 新增功能参考 PRD.md 中的功能定义和数据库设计
+5. 新增模块或功能时，在 `.memories/modules/` 下创建对应文件夹，按现有模式添加 README/PRD/技术文档
 
 ## 注意事项
 - 不要随意修改 backend/config/ 目录下的配置文件，除非明确要求
@@ -86,6 +118,9 @@ const MyComponent = () => {
 - 发布内容需进行敏感词过滤
 - 学校支持用户自主添加，无需审核
 - 校友信息仅作展示与匹配用，无需学籍核验
+- 文件编码统一使用 UTF-8
+- 命令必须兼容 Windows/PowerShell（不使用 `&&` 连接命令）
+- 项目使用原生 Python/Node/PowerShell 脚本，不使用 Docker
 
 ## 隐私与可见性
 - 真实姓名/学校/班级：本人、好友、同圈成员可见，陌生人不可见

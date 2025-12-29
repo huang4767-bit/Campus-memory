@@ -6,20 +6,29 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, message, theme } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { login } from '../../services/auth';
+import useUserStore from '../../stores/userStore';
 
 const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { token } = theme.useToken();
+  const setUser = useUserStore((state) => state.setUser);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      console.log('Login:', values);
+      const res = await login(values);
+      // 存储 Token / Store tokens
+      localStorage.setItem('access_token', res.data.access);
+      localStorage.setItem('refresh_token', res.data.refresh);
+      // 存储用户信息 / Store user info
+      setUser(res.data.user);
       message.success('登录成功');
       navigate('/');
     } catch (error) {
-      message.error('登录失败');
+      const msg = error.response?.data?.message || '登录失败';
+      message.error(msg);
     } finally {
       setLoading(false);
     }

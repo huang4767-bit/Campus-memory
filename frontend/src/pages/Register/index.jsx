@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, message, theme } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { register } from '../../services/auth';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,11 +16,18 @@ const Register = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      console.log('Register:', values);
-      message.success('注册成功');
-      navigate('/');
+      // 转换字段名以匹配后端 / Convert field name to match backend
+      const data = {
+        username: values.username,
+        password: values.password,
+        confirm_password: values.confirmPassword,
+      };
+      await register(data);
+      message.success('注册成功，请登录');
+      navigate('/login');
     } catch (error) {
-      message.error('注册失败');
+      const msg = error.response?.data?.message || '注册失败';
+      message.error(msg);
     } finally {
       setLoading(false);
     }
