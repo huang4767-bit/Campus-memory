@@ -27,3 +27,14 @@
 
 - 依赖模块：无（基础模块）
 - 被依赖模块：所有前端页面模块
+
+## 公共工具函数
+
+**文件位置**：`frontend/src/utils/format.js`
+
+| 函数 | 用途 |
+|------|------|
+| formatRelativeTime | 相对时间（刚刚、3小时前） |
+| formatFullTime | 完整时间（2026年1月1日 12:00） |
+
+**使用位置**：PostCard、Post/index.jsx、CommentItem

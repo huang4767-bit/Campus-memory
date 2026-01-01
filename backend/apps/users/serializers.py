@@ -6,6 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserProfile
 from apps.schools.serializers import SchoolSerializer
+from apps.circles.services import auto_join_circles
 
 User = get_user_model()
 
@@ -112,6 +113,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """更新资料，检查是否完善 / Update profile and check completion"""
+        was_complete = instance.is_profile_complete
         instance = super().update(instance, validated_data)
 
         # 检查是否完善资料 / Check if profile is complete
@@ -124,5 +126,9 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
         ]):
             instance.is_profile_complete = True
             instance.save(update_fields=['is_profile_complete'])
+
+            # 首次完善资料时自动入圈 / Auto join circles on first completion
+            if not was_complete:
+                auto_join_circles(instance.user)
 
         return instance

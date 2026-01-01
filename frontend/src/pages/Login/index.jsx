@@ -17,21 +17,15 @@ const Login = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
-    try {
-      const res = await login(values);
-      // 存储 Token / Store tokens
+    const res = await login(values);
+    if (res?.data) {
       localStorage.setItem('access_token', res.data.access);
       localStorage.setItem('refresh_token', res.data.refresh);
-      // 存储用户信息 / Store user info
       setUser(res.data.user);
       message.success('登录成功');
       navigate('/');
-    } catch (error) {
-      const msg = error.response?.data?.message || '登录失败';
-      message.error(msg);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const styles = {

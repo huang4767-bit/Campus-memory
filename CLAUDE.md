@@ -51,6 +51,34 @@ Campus Memory（校园记忆）是一个面向初高中毕业生的校友社交�
 - 注释语言：所有代码注释必须使用中英双语，格式为「中文 / English」
 - **公共模块复用**：开发前必须检查 `backend/common/` 和 `frontend/src/utils/` 目录，优先复用现有模块（如分页、异常处理、响应格式等），避免重复造轮子，便于后期运维
 
+## 公共函数复用规范
+
+开发时如果需要某个功能函数，**必须先检查是否已有公共函数**，禁止重复编写。
+
+### 前端公共函数位置
+- `frontend/src/utils/format.js`：格式化函数（时间、数字等）
+- `frontend/src/services/request.js`：统一错误处理（拦截器已处理，组件无需 try-catch）
+
+### 后端公共模块位置
+- `backend/common/response.py`：统一响应格式
+- `backend/common/pagination.py`：分页配置
+- `backend/common/sensitive.py`：敏感词校验
+- `backend/common/serializers.py`：公共序列化器
+- `backend/apps/circles/services.py`：圈子权限检查（is_circle_admin）
+
+### 已有公共函数清单
+
+| 函数 | 位置 | 用途 |
+|------|------|------|
+| formatRelativeTime | utils/format.js | 相对时间（刚刚、3小时前） |
+| formatFullTime | utils/format.js | 完整时间（2026年1月1日 12:00） |
+| success_response | common/response.py | 成功响应 |
+| error_response | common/response.py | 错误响应 |
+| validate_sensitive_field | common/sensitive.py | 敏感词校验 |
+| UserBriefSerializer | common/serializers.py | 用户简要信息 |
+| get_user_avatar | common/serializers.py | 获取用户头像 |
+| is_circle_admin | circles/services.py | 检查圈子管理员权限 |
+
 ## 前端样式规范
 - **统一使用 Ant Design 的 `useToken` 获取主题变量，禁止使用独立的 CSS 变量文件**
 - 主题配置文件：`frontend/src/styles/theme.js`（唯一的样式配置来源）
@@ -131,3 +159,36 @@ const MyComponent = () => {
 - 用户删除帖子/评论：软删除，显示"已删除"
 - 管理员删除：显示"因违规已被删除"
 - 用户注销：账号禁用，信息脱敏，显示"已注销用户"
+
+## 记忆文档规范
+
+项目使用 `.memories/` 目录管理开发记忆，**必须严格遵循以下规范**：
+
+### 目录结构
+```
+.memories/
+├── modules/
+│   ├── INDEX.md              # 模块索引（必须维护）
+│   └── <模块名>/             # 每个模块一个文件夹
+│       ├── README.md         # 模块导航
+│       ├── PRD.md            # 产品需求
+│       └── FUNCTION-*.md     # 功能实现文档
+└── templates/                # 模板文件
+```
+
+### 命名规范
+- 模块目录：小写 + 连字符，如 `auth-system`、`user-profile`
+- 功能文档：`FUNCTION-功能名.md`，大写，如 `FUNCTION-LOGIN.md`
+
+### 工作流程
+1. **开发前**：查看 `modules/INDEX.md` 了解现有模块
+2. **开发后**：在 `modules/` 下创建对应模块文件夹，包含 README.md、PRD.md、FUNCTION-*.md
+3. **更新索引**：在 `INDEX.md` 中登记新模块
+
+### 禁止事项
+- **禁止**在 `.memories/` 根目录创建单独的 `.md` 文件（如 `1.3_xxx.md`）
+- **禁止**使用数字编号作为文件名前缀
+- **必须**使用文件夹结构组织每个模块
+
+### 例外文件
+- `优化建议.md`：全局技术债务和优化方案汇总，允许放在根目录

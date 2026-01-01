@@ -14,6 +14,9 @@ const Register = lazy(() => import('../pages/Register'));
 const Circle = lazy(() => import('../pages/Circle'));
 const Post = lazy(() => import('../pages/Post'));
 const Profile = lazy(() => import('../pages/Profile'));
+const ProfileComplete = lazy(() => import('../pages/Profile/Complete'));
+const ProfileEdit = lazy(() => import('../pages/Profile/Edit'));
+const UserProfile = lazy(() => import('../pages/User'));
 
 const router = createBrowserRouter([
   {
@@ -25,13 +28,19 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
+    path: '/profile/complete',
+    element: <ProfileComplete />,
+  },
+  {
     path: '/',
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
       { path: 'circle/:id', element: <Circle /> },
       { path: 'post/:id', element: <Post /> },
-      { path: 'profile/:id', element: <Profile /> },
+      { path: 'profile', element: <Profile /> },
+      { path: 'profile/edit', element: <ProfileEdit /> },
+      { path: 'user/:id', element: <UserProfile /> },
     ],
   },
 ]);

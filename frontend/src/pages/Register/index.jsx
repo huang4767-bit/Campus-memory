@@ -15,22 +15,17 @@ const Register = () => {
 
   const onFinish = async (values) => {
     setLoading(true);
-    try {
-      // 转换字段名以匹配后端 / Convert field name to match backend
-      const data = {
-        username: values.username,
-        password: values.password,
-        confirm_password: values.confirmPassword,
-      };
-      await register(data);
+    const data = {
+      username: values.username,
+      password: values.password,
+      confirm_password: values.confirmPassword,
+    };
+    const res = await register(data);
+    if (res?.code === 200 || res?.code === 201) {
       message.success('注册成功，请登录');
       navigate('/login');
-    } catch (error) {
-      const msg = error.response?.data?.message || '注册失败';
-      message.error(msg);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const styles = {

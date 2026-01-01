@@ -3,6 +3,7 @@
  */
 
 import axios from 'axios';
+import { message } from 'antd';
 
 // 创建 axios 实例 / Create axios instance
 const request = axios.create({
@@ -46,7 +47,6 @@ request.interceptors.response.use(
             refresh: refreshToken,
           });
 
-          // SimpleJWT 直接返回 {access: "..."} / SimpleJWT returns {access: "..."} directly
           const { access } = res.data;
           localStorage.setItem('access_token', access);
           originalRequest.headers.Authorization = `Bearer ${access}`;
@@ -54,12 +54,15 @@ request.interceptors.response.use(
           return request(originalRequest);
         }
       } catch (refreshError) {
-        // 刷新失败，清除 token / Refresh failed, clear tokens
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
       }
     }
+
+    // 统一错误提示 / Unified error message
+    const errorMsg = error.response?.data?.message || '请求失败，请稍后重试';
+    message.error(errorMsg);
 
     return Promise.reject(error);
   }

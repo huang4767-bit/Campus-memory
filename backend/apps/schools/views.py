@@ -9,6 +9,7 @@ from common.pagination import StandardPagination
 from common.response import success_response, error_response
 from .models import School
 from .serializers import SchoolSerializer, SchoolCreateSerializer
+from .regions import REGION_DATA
 
 
 class SchoolListCreateView(APIView):
@@ -83,3 +84,36 @@ class SchoolDetailView(APIView):
             return error_response('学校不存在', 404)
 
         return success_response(SchoolSerializer(school).data, '获取成功')
+
+
+class ProvinceListView(APIView):
+    """
+    省份列表视图 / Province List View
+    GET /api/v1/schools/regions/provinces/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """获取所有省份 / Get all provinces"""
+        provinces = list(REGION_DATA.keys())
+        return success_response(provinces, '获取成功')
+
+
+class CityListView(APIView):
+    """
+    城市列表视图 / City List View
+    GET /api/v1/schools/regions/cities/?province=xxx
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """根据省份获取城市列表 / Get cities by province"""
+        province = request.query_params.get('province', '')
+        if not province:
+            return error_response('请选择省份', 400)
+
+        cities = REGION_DATA.get(province, [])
+        if not cities:
+            return error_response('省份不存在', 404)
+
+        return success_response(cities, '获取成功')

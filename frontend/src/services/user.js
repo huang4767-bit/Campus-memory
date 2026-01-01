@@ -4,27 +4,31 @@
 
 import request from './request';
 
-// 获取当前用户信息 / Get current user info
-export const getCurrentUser = () => {
-  return request.get('/users/me/');
+// 获取当前用户资料 / Get current user profile
+export const getProfile = () => {
+  return request.get('/users/profile/');
 };
 
-// 更新个人信息 / Update user info
-export const updateUserInfo = (data) => {
-  return request.put('/users/me/', data);
+// 更新当前用户资料 / Update current user profile
+export const updateProfile = (data) => {
+  return request.put('/users/profile/', data);
 };
 
-// 查看他人主页 / Get user profile
-export const getUserProfile = (id) => {
+// 上传头像 / Upload avatar
+export const uploadAvatar = (file) => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  return request.post('/users/profile/avatar/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+
+// 查看他人主页 / Get other user's profile
+export const getUserById = (id) => {
   return request.get(`/users/${id}/`);
 };
 
-// 搜索校友 / Search alumni
-export const searchUsers = (params) => {
-  return request.post('/users/search/', params);
-};
-
-// 注销账号 / Delete account
-export const deleteAccount = () => {
-  return request.delete('/users/me/');
+// 注销账号 / Deactivate account
+export const deactivateAccount = () => {
+  return request.post('/users/deactivate/');
 };

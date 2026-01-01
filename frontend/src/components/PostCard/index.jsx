@@ -13,6 +13,7 @@ import {
   BookFilled,
 } from '@ant-design/icons';
 import UserAvatar from '../UserAvatar';
+import { formatRelativeTime } from '../../utils/format';
 
 // 图片网格组件 / Image Grid Component
 const ImageGrid = ({ images, token }) => {
@@ -57,7 +58,7 @@ const ActionBar = ({ token, commentCount, likeCount, isLiked, isFavorited, onLik
     alignItems: 'center',
     gap: token.paddingXXS,
     color: isActive
-      ? (isLikeType ? '#F91880' : token.colorPrimary)
+      ? (isLikeType ? token.colorLike : token.colorPrimary)
       : token.colorTextSecondary,
     cursor: 'pointer',
     padding: token.paddingXXS,
@@ -109,17 +110,6 @@ const PostCard = ({ post, onLike, onFavorite }) => {
     created_at,
     circle,
   } = post;
-
-  // 格式化时间 / Format time
-  const formatTime = (time) => {
-    const date = new Date(time);
-    const now = new Date();
-    const diff = now - date;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    if (hours < 1) return '刚刚';
-    if (hours < 24) return `${hours}小时前`;
-    return date.toLocaleDateString();
-  };
 
   const styles = {
     card: {
@@ -185,7 +175,7 @@ const PostCard = ({ post, onLike, onFavorite }) => {
           <span style={styles.author}>{author?.real_name || author?.username}</span>
           <span style={styles.handle}>@{author?.username}</span>
           <span style={styles.handle}>·</span>
-          <span style={styles.handle}>{formatTime(created_at)}</span>
+          <span style={styles.handle}>{formatRelativeTime(created_at)}</span>
         </div>
 
         {circle && <div style={styles.circleTag}>{circle.name}</div>}
