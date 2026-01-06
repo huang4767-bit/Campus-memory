@@ -3,7 +3,7 @@
  */
 
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, theme } from 'antd';
+import { Button, Badge, theme } from 'antd';
 import {
   HomeOutlined,
   HomeFilled,
@@ -13,21 +13,25 @@ import {
   MailOutlined,
   MailFilled,
   UserOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { useUserStore } from '../../stores';
 import UserAvatar from '../UserAvatar';
+import useMessagePolling from '../../hooks/useMessagePolling';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { token } = theme.useToken();
   const { user, isLoggedIn } = useUserStore();
+  const { unreadCount } = useMessagePolling({ enabled: isLoggedIn });
 
   const menuItems = [
     { key: '/', icon: HomeOutlined, activeIcon: HomeFilled, label: '首页' },
     { key: '/explore', icon: SearchOutlined, activeIcon: SearchOutlined, label: '探索' },
     { key: '/notifications', icon: BellOutlined, activeIcon: BellFilled, label: '通知' },
-    { key: '/messages', icon: MailOutlined, activeIcon: MailFilled, label: '消息' },
+    { key: '/message', icon: MailOutlined, activeIcon: MailFilled, label: '消息', badge: unreadCount },
+    { key: '/friend', icon: TeamOutlined, activeIcon: TeamOutlined, label: '好友' },
     { key: '/profile', icon: UserOutlined, activeIcon: UserOutlined, label: '个人主页' },
   ];
 
@@ -116,7 +120,9 @@ const Sidebar = () => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(15, 20, 25, 0.1)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <Icon style={styles.navIcon} />
+              <Badge count={item.badge} size="small" offset={[-5, 5]}>
+                <Icon style={styles.navIcon} />
+              </Badge>
               <span style={styles.navLabel}>{item.label}</span>
             </div>
           );

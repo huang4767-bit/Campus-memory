@@ -120,3 +120,9 @@ class CommentCreateSerializer(serializers.Serializer):
     def validate_content(self, value):
         """检查敏感词 / Check sensitive words"""
         return validate_sensitive_field(value, '评论内容')
+
+
+class PostPinSerializer(serializers.Serializer):
+    """置顶/精华设置序列化器 / Pin/Feature Post Serializer"""
+    is_pinned = serializers.BooleanField(required=False)
+    is_featured = serializers.BooleanField(required=False)

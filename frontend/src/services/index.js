@@ -9,3 +9,5 @@ export * from './school';
 export * from './circle';
 export * from './post';
 export * from './interaction';
+export * from './message';
+export * from './friend';

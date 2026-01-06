@@ -3,6 +3,24 @@
 """
 
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
+
+def validate_user_exists(user_id):
+    """
+    校验用户是否存在 / Validate user exists
+
+    Args:
+        user_id: 用户ID
+    Returns:
+        user_id
+    Raises:
+        ValidationError: 用户不存在时抛出
+    """
+    User = get_user_model()
+    if not User.objects.filter(id=user_id).exists():
+        raise serializers.ValidationError("用户不存在")
+    return user_id
 
 
 def get_user_avatar(user):

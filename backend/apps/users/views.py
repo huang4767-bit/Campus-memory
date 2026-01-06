@@ -13,9 +13,11 @@ from django.utils import timezone
 from datetime import timedelta
 
 from common.response import success_response, error_response
+from common.pagination import StandardPagination, paginated_response
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserInfoSerializer,
-    UserProfileSerializer, UserProfileUpdateSerializer
+    UserProfileSerializer, UserProfileUpdateSerializer,
+    UserSearchSerializer, UserSearchResultSerializer
 )
 from .models import UserProfile
 
@@ -206,3 +208,49 @@ class UserDeactivateView(APIView):
             pass
 
         return success_response(None, '账号已注销')
+
+
+class UserSearchView(APIView):
+    """
+    校友搜索视图 / User Search View
+    POST /api/v1/users/search/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """搜索校友 / Search users"""
+        serializer = UserSearchSerializer(data=request.data)
+        if not serializer.is_valid():
+            return error_response('参数错误', 400, serializer.errors)
+
+        data = serializer.validated_data
+        school_id = data['school_id']
+
+        # 构建查询 / Build query
+        queryset = UserProfile.objects.filter(
+            school_id=school_id,
+            is_profile_complete=True
+        ).select_related('user', 'school')
+
+        # 可选条件 / Optional filters
+        if data.get('graduation_year'):
+            queryset = queryset.filter(graduation_year=data['graduation_year'])
+
+        if data.get('class_name'):
+            queryset = queryset.filter(class_name__icontains=data['class_name'])
+
+        if data.get('name'):
+            queryset = queryset.filter(real_name__icontains=data['name'])
+
+        # 排除自己 / Exclude self
+        queryset = queryset.exclude(user=request.user)
+
+        # 排序 / Order by
+        queryset = queryset.order_by('-graduation_year', 'real_name')
+
+        # 分页 / Pagination
+        paginator = StandardPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        result_serializer = UserSearchResultSerializer(page, many=True)
+
+        return paginated_response(paginator, result_serializer.data)

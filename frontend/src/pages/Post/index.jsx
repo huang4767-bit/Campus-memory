@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { theme, Spin, Empty } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import UserAvatar from '../../components/UserAvatar';
+import ReportModal from '../../components/ReportModal';
 import PostActions from './PostActions';
 import CommentSection from './CommentSection';
 import { formatFullTime } from '../../utils/format';
@@ -23,6 +24,7 @@ const Post = () => {
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     loadPost();
@@ -155,9 +157,17 @@ const Post = () => {
         post={post}
         onLike={handleLike}
         onFavorite={handleFavorite}
+        onReport={() => setShowReportModal(true)}
       />
 
       <CommentSection postId={id} />
+
+      <ReportModal
+        open={showReportModal}
+        onCancel={() => setShowReportModal(false)}
+        targetType="post"
+        targetId={parseInt(id)}
+      />
     </div>
   );
 };

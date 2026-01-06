@@ -38,3 +38,10 @@ export const updatePost = (id, data) => {
 export const deletePost = (id) => {
   return request.delete(`/posts/${id}/`);
 };
+
+/**
+ * 获取首页动态流 / Get home feed
+ */
+export const getFeed = (params) => {
+  return request.get('/feed/', { params });
+};

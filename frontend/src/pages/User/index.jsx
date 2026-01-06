@@ -5,15 +5,20 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Avatar, Button, Tabs, Empty, Spin, theme, Typography, Result } from 'antd';
+import { Card, Avatar, Button, Tabs, Empty, Spin, Space, theme, Typography, Result, message } from 'antd';
 import {
   UserOutlined,
   EnvironmentOutlined,
   CalendarOutlined,
   ArrowLeftOutlined,
   UserAddOutlined,
+  MessageOutlined,
+  CheckOutlined,
+  StopOutlined,
 } from '@ant-design/icons';
 import { getUserById } from '../../services/user';
+import { sendFriendRequest } from '../../services/friend';
+import { useUserStore } from '../../stores';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -21,9 +26,13 @@ const UserProfile = () => {
   const { token } = theme.useToken();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useUserStore();
+
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
+  const [friendStatus, setFriendStatus] = useState('none'); // none, pending, friend
+  const [actionLoading, setActionLoading] = useState(false);
 
   // 加载用户资料 / Load user profile
   useEffect(() => {
@@ -36,12 +45,57 @@ const UserProfile = () => {
     setLoading(true);
     setError(null);
     const res = await getUserById(id);
-    if (res?.code === 0) {
+    if (res?.code === 200) {
       setProfile(res.data);
+      // 设置好友状态 / Set friend status
+      setFriendStatus(res.data?.friend_status || 'none');
     } else if (res) {
       setError(res.message || '用户不存在');
     }
     setLoading(false);
+  };
+
+  // 发送好友请求 / Send friend request
+  const handleAddFriend = async () => {
+    setActionLoading(true);
+    const res = await sendFriendRequest({ to_user_id: parseInt(id) });
+    if (res?.code === 200 || res?.code === 201) {
+      message.success('好友请求已发送');
+      setFriendStatus('pending');
+    }
+    setActionLoading(false);
+  };
+
+  // 发私信 / Send message
+  const handleSendMessage = () => {
+    navigate(`/message`, { state: { startChatWith: parseInt(id) } });
+  };
+
+  // 渲染操作按钮 / Render action buttons
+  const renderActionButtons = () => {
+    // 不显示自己的操作按钮 / Don't show buttons for self
+    if (user?.id === parseInt(id)) return null;
+
+    return (
+      <Space>
+        {friendStatus === 'friend' ? (
+          <Button icon={<CheckOutlined />} disabled>已是好友</Button>
+        ) : friendStatus === 'pending' ? (
+          <Button icon={<UserAddOutlined />} disabled>已申请</Button>
+        ) : (
+          <Button
+            icon={<UserAddOutlined />}
+            onClick={handleAddFriend}
+            loading={actionLoading}
+          >
+            加好友
+          </Button>
+        )}
+        <Button icon={<MessageOutlined />} onClick={handleSendMessage}>
+          私信
+        </Button>
+      </Space>
+    );
   };
 
   // Tab 项配置 / Tab items config
@@ -115,9 +169,7 @@ const UserProfile = () => {
             icon={<UserOutlined />}
             style={{ backgroundColor: token.colorPrimary }}
           />
-          <Button icon={<UserAddOutlined />}>
-            加好友
-          </Button>
+          {renderActionButtons()}
         </div>
 
         {/* 用户名和简介 / Username and bio */}

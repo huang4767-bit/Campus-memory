@@ -9,9 +9,10 @@ import {
   HeartFilled,
   BookOutlined,
   BookFilled,
+  WarningOutlined,
 } from '@ant-design/icons';
 
-const PostActions = ({ post, onLike, onFavorite }) => {
+const PostActions = ({ post, onLike, onFavorite, onReport }) => {
   const { token } = theme.useToken();
 
   const styles = {
@@ -51,6 +52,9 @@ const PostActions = ({ post, onLike, onFavorite }) => {
       </div>
       <div style={getItemStyle(post.is_favorited, false)} onClick={onFavorite}>
         {post.is_favorited ? <BookFilled /> : <BookOutlined />}
+      </div>
+      <div style={getItemStyle(false, false)} onClick={onReport}>
+        <WarningOutlined />
       </div>
     </div>
   );

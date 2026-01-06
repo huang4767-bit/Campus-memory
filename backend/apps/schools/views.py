@@ -5,7 +5,7 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from common.pagination import StandardPagination
+from common.pagination import StandardPagination, paginated_response
 from common.response import success_response, error_response
 from .models import School
 from .serializers import SchoolSerializer, SchoolCreateSerializer
@@ -49,12 +49,7 @@ class SchoolListCreateView(APIView):
         page = paginator.paginate_queryset(queryset, request)
         serializer = SchoolSerializer(page, many=True)
 
-        return success_response({
-            'total': paginator.page.paginator.count,
-            'page': paginator.page.number,
-            'page_size': paginator.page_size,
-            'results': serializer.data
-        }, '获取成功')
+        return paginated_response(paginator, serializer.data)
 
     def post(self, request):
         """添加新学校 / Create new school"""

@@ -65,6 +65,7 @@ Campus Memory（校园记忆）是一个面向初高中毕业生的校友社交�
 - `backend/common/sensitive.py`：敏感词校验
 - `backend/common/serializers.py`：公共序列化器
 - `backend/apps/circles/services.py`：圈子权限检查（is_circle_admin）
+- `backend/apps/friends/services.py`：好友关系检查（is_friend, is_blocked_by, has_blocked）
 
 ### 已有公共函数清单
 
@@ -78,6 +79,9 @@ Campus Memory（校园记忆）是一个面向初高中毕业生的校友社交�
 | UserBriefSerializer | common/serializers.py | 用户简要信息 |
 | get_user_avatar | common/serializers.py | 获取用户头像 |
 | is_circle_admin | circles/services.py | 检查圈子管理员权限 |
+| is_friend | friends/services.py | 检查是否是好友 |
+| is_blocked_by | friends/services.py | 检查是否被对方拉黑 |
+| has_blocked | friends/services.py | 检查是否拉黑了对方 |
 
 ## 前端样式规范
 - **统一使用 Ant Design 的 `useToken` 获取主题变量，禁止使用独立的 CSS 变量文件**

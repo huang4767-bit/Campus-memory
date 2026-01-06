@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     RegisterView, LoginView,
-    UserProfileView, AvatarUploadView, UserDetailView, UserDeactivateView
+    UserProfileView, AvatarUploadView, UserDetailView, UserDeactivateView,
+    UserSearchView
 )
 
 urlpatterns = [
@@ -22,5 +23,6 @@ profile_urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('profile/avatar/', AvatarUploadView.as_view(), name='avatar-upload'),
     path('deactivate/', UserDeactivateView.as_view(), name='user-deactivate'),
+    path('search/', UserSearchView.as_view(), name='user-search'),
     path('<int:pk>/', UserDetailView.as_view(), name='user-detail'),
 ]

@@ -14,6 +14,13 @@
 | [post-module](./post-module/) | 帖子模块 | 2026-01-01 |
 | [interaction-module](./interaction-module/) | 互动模块 | 2026-01-01 |
 | [frontend-circle-post](./frontend-circle-post/) | 前端圈子帖子页面 | 2026-01-01 |
+| [friends-module](./friends-module/) | 好友系统模块 | 2026-01-05 |
+| [message-module](./message-module/) | 消息系统模块 | 2026-01-05 |
+| [frontend-social](./frontend-social/) | 前端社交页面 | 2026-01-06 |
+| [home-feed](./home-feed/) | 首页动态流 | 2026-01-06 |
+| [user-search](./user-search/) | 校友搜索 | 2026-01-06 |
+| [album-report-module](./album-report-module/) | 相册与举报模块 | 2026-01-06 |
+| [admin-deploy-module](./admin-deploy-module/) | 管理后台与部署 | 2026-01-06 |
 
 ## 开发阶段进度
 
@@ -30,5 +37,15 @@
   - [x] 3.2 帖子模块 → `post-module`
   - [x] 3.3 互动模块 → `interaction-module`
   - [x] 3.4 前端圈子帖子页面 → `frontend-circle-post`
-- [ ] 阶段四：社交连接
-- [ ] 阶段五：增值与完善
+- [x] 阶段四：社交连接
+  - [x] 4.1 好友系统 → `friends-module`
+  - [x] 4.2 消息系统 → `message-module`
+  - [x] 4.3 前端社交页面 → `frontend-social`
+- [x] 阶段五：增值与完善
+  - [x] 5.1 相册与举报模块 → `album-report-module`
+  - [x] 5.2 管理后台与部署 → `admin-deploy-module`
+
+## 额外完成的功能
+
+- [x] 首页动态流 → `home-feed`（属于 3.4 的补充）
+- [x] 校友搜索 → `user-search`（属于 4.1 的补充）

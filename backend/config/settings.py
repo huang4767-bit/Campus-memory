@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "apps.albums",
     "apps.messages",
     "apps.reports",
+    "apps.friends",
 ]
 
 

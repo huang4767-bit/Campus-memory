@@ -5,7 +5,7 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from common.pagination import StandardPagination
+from common.pagination import StandardPagination, paginated_response
 from common.response import success_response, error_response
 from .models import Circle, CircleMember
 from .serializers import (
@@ -166,12 +166,7 @@ class CircleMemberListView(APIView):
         page = paginator.paginate_queryset(members, request)
         serializer = CircleMemberSerializer(page, many=True)
 
-        return success_response({
-            'total': paginator.page.paginator.count,
-            'page': paginator.page.number,
-            'page_size': paginator.page_size,
-            'results': serializer.data
-        }, '获取成功')
+        return paginated_response(paginator, serializer.data)
 
 
 class CircleApplicationListView(APIView):

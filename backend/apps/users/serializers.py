@@ -132,3 +132,29 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
                 auto_join_circles(instance.user)
 
         return instance
+
+
+class UserSearchSerializer(serializers.Serializer):
+    """
+    校友搜索参数序列化器 / User Search Params Serializer
+    """
+    school_id = serializers.IntegerField(required=True)
+    graduation_year = serializers.IntegerField(required=False)
+    class_name = serializers.CharField(required=False, max_length=50)
+    name = serializers.CharField(required=False, max_length=50)
+
+
+class UserSearchResultSerializer(serializers.ModelSerializer):
+    """
+    校友搜索结果序列化器 / User Search Result Serializer
+    """
+    user_id = serializers.IntegerField(source='user.id')
+    username = serializers.CharField(source='user.username')
+    school_name = serializers.CharField(source='school.name', default=None)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user_id', 'username', 'real_name', 'avatar',
+            'school_name', 'graduation_year', 'class_name'
+        ]

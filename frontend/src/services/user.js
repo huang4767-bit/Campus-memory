@@ -32,3 +32,8 @@ export const getUserById = (id) => {
 export const deactivateAccount = () => {
   return request.post('/users/deactivate/');
 };
+
+// 搜索校友 / Search users
+export const searchUsers = (data) => {
+  return request.post('/users/search/', data);
+};

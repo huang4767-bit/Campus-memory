@@ -7,19 +7,21 @@ import uuid
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import F
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 
-from common.pagination import StandardPagination
+from common.pagination import StandardPagination, paginated_response
 from common.response import success_response, error_response
 from apps.circles.models import Circle, CircleMember
 from apps.circles.services import is_circle_admin
 from .models import Post, Comment, Like, Favorite
 from .serializers import (
     PostSerializer, PostCreateSerializer, PostUpdateSerializer,
-    CommentSerializer, CommentCreateSerializer
+    CommentSerializer, CommentCreateSerializer, PostPinSerializer
 )
 
 
@@ -105,12 +107,7 @@ class CirclePostListView(APIView):
         page = paginator.paginate_queryset(posts, request)
         serializer = PostSerializer(page, many=True, context={'request': request})
 
-        return success_response({
-            'total': paginator.page.paginator.count,
-            'page': paginator.page.number,
-            'page_size': paginator.page_size,
-            'results': serializer.data
-        }, '获取成功')
+        return paginated_response(paginator, serializer.data)
 
     def post(self, request, circle_id):
         """发布帖子 / Create post"""
@@ -170,9 +167,9 @@ class PostDetailView(APIView):
         if post.status == 'violation':
             return error_response('该帖子因违规已被删除', 404)
 
-        # 增加浏览量 / Increment view count
-        post.view_count += 1
-        post.save(update_fields=['view_count'])
+        # 增加浏览量（使用 F() 避免竞态条件）/ Increment view count (use F() to avoid race condition)
+        Post.objects.filter(pk=pk).update(view_count=F('view_count') + 1)
+        post.refresh_from_db(fields=['view_count'])
         post.update_hot_score()
 
         return success_response(
@@ -244,11 +241,17 @@ class PostPinView(APIView):
         if not is_circle_admin(post.circle, request.user):
             return error_response('无权限操作', 403)
 
+        # 验证数据 / Validate data
+        serializer = PostPinSerializer(data=request.data)
+        if not serializer.is_valid():
+            return error_response('参数错误', 400, serializer.errors)
+
         # 更新状态 / Update status
-        if 'is_pinned' in request.data:
-            post.is_pinned = request.data['is_pinned']
-        if 'is_featured' in request.data:
-            post.is_featured = request.data['is_featured']
+        data = serializer.validated_data
+        if 'is_pinned' in data:
+            post.is_pinned = data['is_pinned']
+        if 'is_featured' in data:
+            post.is_featured = data['is_featured']
         post.save(update_fields=['is_pinned', 'is_featured'])
 
         return success_response(
@@ -283,12 +286,7 @@ class PostCommentListView(APIView):
         page = paginator.paginate_queryset(comments, request)
         serializer = CommentSerializer(page, many=True)
 
-        return success_response({
-            'total': paginator.page.paginator.count,
-            'page': paginator.page.number,
-            'page_size': paginator.page_size,
-            'results': serializer.data
-        }, '获取成功')
+        return paginated_response(paginator, serializer.data)
 
     def post(self, request, post_id):
         """发表评论 / Create comment"""
@@ -315,7 +313,6 @@ class PostCommentListView(APIView):
                 return error_response('父评论不存在', 404)
 
         if data.get('reply_to_id'):
-            from django.contrib.auth import get_user_model
             User = get_user_model()
             try:
                 reply_to = User.objects.get(pk=data['reply_to_id'])
@@ -471,9 +468,32 @@ class MyFavoriteListView(APIView):
         posts = [f.post for f in page]
         serializer = PostSerializer(posts, many=True, context={'request': request})
 
-        return success_response({
-            'total': paginator.page.paginator.count,
-            'page': paginator.page.number,
-            'page_size': paginator.page_size,
-            'results': serializer.data
-        }, '获取成功')
+        return paginated_response(paginator, serializer.data)
+
+
+class FeedView(APIView):
+    """
+    首页动态流 / Home Feed
+    GET /api/v1/feed/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """获取用户已加入圈子的最新帖子 / Get posts from joined circles"""
+        # 获取用户加入的圈子 ID / Get user's joined circle IDs
+        joined_circle_ids = CircleMember.objects.filter(
+            user=request.user, status='approved'
+        ).values_list('circle_id', flat=True)
+
+        # 查询这些圈子的帖子 / Query posts from these circles
+        posts = Post.objects.filter(
+            circle_id__in=joined_circle_ids, status='normal'
+        ).select_related(
+            'author', 'author__profile', 'circle'
+        ).order_by('-created_at')
+
+        paginator = StandardPagination()
+        page = paginator.paginate_queryset(posts, request)
+        serializer = PostSerializer(page, many=True, context={'request': request})
+
+        return paginated_response(paginator, serializer.data)

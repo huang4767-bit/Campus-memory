@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { theme, Button, Tabs, Spin, Empty, message } from 'antd';
-import { ArrowLeftOutlined, TeamOutlined, EditOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, TeamOutlined, EditOutlined, PictureOutlined } from '@ant-design/icons';
 import PostCard from '../../components/PostCard';
 import CreatePostModal from './CreatePostModal';
 import {
@@ -218,6 +218,14 @@ const Circle = () => {
           >
             {circle.is_member ? '退出圈子' : '加入圈子'}
           </Button>
+          {circle.circle_type === 'class' && circle.is_member && (
+            <Button
+              icon={<PictureOutlined />}
+              onClick={() => navigate(`/circle/${id}/album`)}
+            >
+              班级相册
+            </Button>
+          )}
         </div>
       </div>
 
